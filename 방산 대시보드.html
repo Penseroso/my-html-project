@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>2025 FOMC/엔캐리 & 방산 우주 BM 심층 분석</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        /* 기본 폰트 및 배경 */
+        body { 
+            font-family: 'Noto Sans KR', sans-serif; 
+            background-color: #f3f4f6;
+            /* iOS 폰트 크기 자동 조정 방지 */
+            -webkit-text-size-adjust: 100%;
+            /* iOS 부드러운 스크롤 */
+            -webkit-overflow-scrolling: touch;
+            overflow-x: hidden;
+        }
+
+        /* 탭 스타일 */
+        .tab-active { 
+            border-bottom: 3px solid #1e3a8a; 
+            color: #1e3a8a; 
+            font-weight: 700;
+        }
+        .tab-inactive { 
+            border-bottom: 3px solid transparent; 
+            color: #6b7280; 
+        }
+        .tab-inactive:hover { color: #374151; }
+        
+        /* 커스텀 스크롤바 (Webkit) */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c5c5c5; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        /* 글래스모피즘 패널 */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* iOS 지원 */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* PRINT STYLES - SCREENSHOT MODE */
+        @media print {
+            @page {
+                size: A4 portrait; /* A4 세로 */
+                margin: 0; /* 여백 제거 */
+            }
+            
+            html {
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: #f3f4f6 !important;
+            }
+
+            body {
+                /* 내용이 잘리지 않도록 높이 제한 제거 */
+                width: 210mm; 
+                min-height: 297mm; 
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: #f3f4f6 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                
+                /* 한 페이지에 맞추기 위한 축소 (70%) */
+                transform: scale(0.70);
+                transform-origin: top center;
+                width: 142.8%; /* 100% / 0.70 ≈ 142.8% (폭 보정) */
+            }
+
+            /* 인쇄 시 불필요한 요소 숨김 */
+            .no-print, header button, .sticky, header .text-right {
+                display: none !important;
+            }
+
+            /* 헤더 스타일 조정 */
+            header {
+                padding-top: 30px !important;
+                padding-bottom: 20px !important;
+            }
+
+            /* [중요] 화면에 보이는 탭(active tab)만 인쇄 */
+            #content-macro, #content-space {
+                padding: 20px 50px !important; /* 좌우 여백 확보 */
+            }
+
+            /* 숨겨진 탭은 인쇄에서도 확실히 숨김 */
+            .hidden {
+                display: none !important;
+            }
+
+            /* 텍스트 색상 및 그림자 복원 */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                text-shadow: none !important;
+            }
+            
+            p, span, div, li, td, th, h1, h2, h3, h4 {
+                color: inherit !important;
+            }
+            
+            .bg-slate-900, .bg-slate-800, .bg-indigo-900 {
+                color: white !important;
+            }
+            .bg-slate-900 *, .bg-slate-800 *, .bg-indigo-900 * {
+                color: rgba(255, 255, 255, 0.95) !important;
+            }
+
+            .glass-panel, .bg-white {
+                box-shadow: none !important;
+                border: 1px solid #d1d5db !important;
+            }
+            
+            .animate-fade-in {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white py-8 shadow-lg print:bg-slate-900 print:text-white">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div>
+                    <div class="text-xs font-bold text-blue-400 tracking-wider mb-1 uppercase">Strategic Market Report</div>
+                    <h1 class="text-2xl md:text-3xl font-bold leading-tight">2025 FOMC/엔캐리 시나리오 &<br>주요 방산기업 우주 BM 분석</h1>
+                </div>
+                <div class="mt-4 md:mt-0 text-right no-print">
+                    <div class="text-sm text-gray-400">Date: 2025-12-06</div>
+                    <!-- 프린트 버튼 제거됨 -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs (Hidden on Print) -->
+    <div class="bg-white sticky top-0 z-50 shadow-sm no-print w-full">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="flex space-x-8 overflow-x-auto pb-1 md:pb-0 hide-scrollbar">
+                <button onclick="switchTab('macro')" id="tab-macro" class="tab-active py-4 text-sm md:text-base transition-all flex items-center gap-2 whitespace-nowrap">
+                    <i class="ph ph-trend-up"></i> 1. 매크로 & 엔캐리 분석
+                </button>
+                <button onclick="switchTab('space')" id="tab-space" class="tab-inactive py-4 text-sm md:text-base transition-all flex items-center gap-2 whitespace-nowrap">
+                    <i class="ph ph-rocket-launch"></i> 2. 방산 우주 BM 비교
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-6xl min-h-screen">
+
+        <!-- TAB 1: MACRO & YEN CARRY -->
+        <div id="content-macro" class="space-y-8 animate-fade-in">
+            
+            <!-- 1.1 Overview Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 page-break-inside-avoid">
+                <!-- Fed Card -->
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-blue-600 bg-white">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-blue-100 p-2 rounded-lg text-blue-700"><i class="ph ph-bank text-2xl"></i></div>
+                        <h2 class="text-lg font-bold">미국 연준 (Fed)</h2>
+                    </div>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-start gap-2"><i class="ph ph-check-circle text-blue-500 mt-1"></i><span>12월 FOMC <strong>25bp 인하</strong> 유력 (현재 기준 확률 80%↑)</span></li>
+                        <li class="flex items-start gap-2"><i class="ph ph-check-circle text-blue-500 mt-1"></i><span>경기 둔화 신호 및 비둘기파적 발언 영향</span></li>
+                    </ul>
+                </div>
+                <!-- BOJ Card -->
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-red-600 bg-white">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-red-100 p-2 rounded-lg text-red-700"><i class="ph ph-currency-yen text-2xl"></i></div>
+                        <h2 class="text-lg font-bold">일본은행 (BOJ)</h2>
+                    </div>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-start gap-2"><i class="ph ph-check-circle text-red-500 mt-1"></i><span>현재 <strong>0.5%</strong>이며, 12월 <strong>0.75% 인상</strong> 가능성 높게 반영</span></li>
+                        <li class="flex items-start gap-2"><i class="ph ph-check-circle text-red-500 mt-1"></i><span>일본 국채 수익률 2007년 이후 최고치</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 1.2 Carry Trade Mechanism -->
+            <div class="bg-slate-800 text-white p-6 rounded-xl shadow-lg relative overflow-hidden page-break-inside-avoid print:bg-slate-800 print:text-white">
+                <div class="absolute top-0 right-0 p-10 opacity-10">
+                    <i class="ph ph-arrows-left-right text-9xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-warning-circle text-yellow-400"></i> 엔캐리 트레이드 구조 및 2025 전망</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center items-center mb-6">
+                    <div class="bg-slate-700 p-4 rounded-lg border border-slate-600">
+                        <div class="text-red-300 font-bold mb-1">Step 1</div>
+                        <div class="text-sm">엔화 저금리 차입</div>
+                    </div>
+                    <div class="hidden md:block text-gray-400"><i class="ph ph-arrow-right text-2xl"></i></div>
+                    <div class="bg-slate-700 p-4 rounded-lg border border-slate-600">
+                        <div class="text-yellow-300 font-bold mb-1">Step 2</div>
+                        <div class="text-sm">달러/기타 통화 환전</div>
+                    </div>
+                    <div class="hidden md:block text-gray-400"><i class="ph ph-arrow-right text-2xl"></i></div>
+                    <div class="bg-slate-700 p-4 rounded-lg border border-slate-600">
+                        <div class="text-green-300 font-bold mb-1">Step 3</div>
+                        <div class="text-sm">고금리 자산 투자</div>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-300 bg-slate-900/50 p-4 rounded border border-slate-600 print:text-gray-200">
+                    <strong>2025년 핵심:</strong> 미-일 금리차 축소로 기대 수익률 감소. 단, 시장은 2008년급 대규모 청산보다는 '점진적 축소'에 무게 (투기적 숏 포지션은 완화되었으나, 언와인드 변동성 리스크는 여전히 존재).
+                </p>
+            </div>
+
+            <!-- 1.3 Scenarios (3 Columns) -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-gray-800 border-l-4 border-slate-800 pl-3">2025 시나리오별 시장 영향</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Scenario 1: Base -->
+                    <div class="bg-white rounded-xl shadow-md border-t-4 border-green-500 flex flex-col h-full page-break-inside-avoid">
+                        <div class="p-5 border-b border-gray-100 bg-green-50">
+                            <div class="text-xs font-bold text-green-700 mb-1">BASE CASE (컨센서스)</div>
+                            <h4 class="font-bold text-lg">완만한 인하 + 점진적 인상</h4>
+                        </div>
+                        <div class="p-5 flex-1 text-sm space-y-4">
+                            <div>
+                                <strong class="block text-gray-700 mb-1">거시 환경</strong>
+                                <p class="text-gray-500">美 장기금리 3~3.5% 안착, 日 데이터 의존적 인상. 엔캐리 점진적 축소.</p>
+                            </div>
+                            <div>
+                                <strong class="block text-gray-700 mb-1">방산주 영향</strong>
+                                <p class="text-gray-500">수주/백로그 중심 방산주 <span class="text-green-600 font-bold">Outperform</span>. 밸류에이션에 중립~긍정적.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scenario 2: Risk -->
+                    <div class="bg-white rounded-xl shadow-md border-t-4 border-red-500 flex flex-col h-full page-break-inside-avoid">
+                        <div class="p-5 border-b border-gray-100 bg-red-50">
+                            <div class="text-xs font-bold text-red-700 mb-1">RISK SCENARIO</div>
+                            <h4 class="font-bold text-lg">BOJ 강매파 + 엔 급등</h4>
+                        </div>
+                        <div class="p-5 flex-1 text-sm space-y-4">
+                            <div>
+                                <strong class="block text-gray-700 mb-1">거시 환경</strong>
+                                <p class="text-gray-500">엔화 단기 폭등 → 레버리지 펀드 마진콜 발생 (강제 청산).</p>
+                            </div>
+                            <div>
+                                <strong class="block text-gray-700 mb-1">방산주 영향</strong>
+                                <p class="text-gray-500">초기엔 유동성 확보 차원 동반 급락. 이후 <span class="text-blue-600 font-bold">방어주 성격 부각</span>되며 빠른 회복.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scenario 3: Surprise -->
+                    <div class="bg-white rounded-xl shadow-md border-t-4 border-orange-500 flex flex-col h-full page-break-inside-avoid">
+                        <div class="p-5 border-b border-gray-100 bg-orange-50">
+                            <div class="text-xs font-bold text-orange-700 mb-1">SURPRISE (HAWKISH)</div>
+                            <h4 class="font-bold text-lg">美 금리 동결/지연</h4>
+                        </div>
+                        <div class="p-5 flex-1 text-sm space-y-4">
+                            <div>
+                                <strong class="block text-gray-700 mb-1">거시 환경</strong>
+                                <p class="text-gray-500">금리차 축소 지연 → 엔 약세/달러 강세 재개. 엔캐리 재가동.</p>
+                            </div>
+                            <div>
+                                <strong class="block text-gray-700 mb-1">방산주 영향</strong>
+                                <p class="text-gray-500">Risk-On 심리에 상대 수익률 둔화 가능성. 그러나 하방은 제한적.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investment Implications -->
+            <div class="bg-gray-100 p-6 rounded-xl border border-gray-200 page-break-inside-avoid">
+                <h4 class="font-bold text-gray-800 mb-3 flex items-center gap-2"><i class="ph ph-lightbulb text-yellow-500 text-xl"></i> 투자 시사점</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-3 rounded shadow-sm text-sm border border-gray-200">
+                        <strong class="text-red-600 block mb-1">LHX (L3Harris)</strong>
+                        <span class="text-gray-600">섹터 내 상위권 마진율. 전자전/우주 고성장 + 낮은 스캔들 리스크.</span>
+                    </div>
+                    <div class="bg-white p-3 rounded shadow-sm text-sm border border-gray-200">
+                        <strong class="text-blue-600 block mb-1">GD (Gen. Dynamics)</strong>
+                        <span class="text-gray-600">개별 프로젝트(Ajax 등) 리스크로 디스카운트 지속 가능성.</span>
+                    </div>
+                    <div class="bg-white p-3 rounded shadow-sm text-sm border border-gray-200">
+                        <strong class="text-orange-600 block mb-1">RTX (Raytheon)</strong>
+                        <span class="text-gray-600">민항기 비중 높아 경기/유가 민감도 주의 필요.</span>
+                    </div>
+                    <div class="bg-white p-3 rounded shadow-sm text-sm border border-gray-200">
+                        <strong class="text-purple-600 block mb-1">NOC (Northrop)</strong>
+                        <span class="text-gray-600">장기 포트폴리오 우수하나 최근 실적 노이즈로 긴 호흡 접근.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- END TAB 1 -->
+
+
+        <!-- TAB 2: SPACE BM ANALYSIS -->
+        <div id="content-space" class="hidden space-y-8 animate-fade-in">
+            
+            <!-- Intro Text -->
+            <div class="bg-indigo-900 text-white p-8 rounded-2xl flex flex-col md:flex-row items-center justify-between shadow-xl page-break-inside-avoid print:bg-indigo-900 print:text-white">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">우주 비즈니스 모델(BM) 심층 분석</h2>
+                    <p class="text-indigo-200 print:text-indigo-100">주요 4대 방산기업(GD, LHX, RTX, NOC)의 우주 사업 구조와 투자 포인트 비교</p>
+                </div>
+                <div class="mt-4 md:mt-0 bg-white/10 p-4 rounded-lg backdrop-blur-sm">
+                    <div class="grid grid-cols-2 md:flex md:flex-row gap-x-4 gap-y-2 text-sm font-medium">
+                        <span class="flex items-center gap-1"><div class="w-3 h-3 bg-blue-400 rounded-full"></div> 통신/플랫폼</span>
+                        <span class="flex items-center gap-1"><div class="w-3 h-3 bg-red-400 rounded-full"></div> 센서/특화</span>
+                        <span class="flex items-center gap-1"><div class="w-3 h-3 bg-orange-400 rounded-full"></div> 솔루션/복합</span>
+                        <span class="flex items-center gap-1"><div class="w-3 h-3 bg-purple-400 rounded-full"></div> 풀스택</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200 page-break-inside-avoid">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+                        <tr>
+                            <th class="px-6 py-4">기업</th>
+                            <th class="px-6 py-4">핵심 키워드</th>
+                            <th class="px-6 py-4">주요 특징</th>
+                            <th class="px-6 py-4">투자 매력도 (우주 관점)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-bold text-gray-900">GD</td>
+                            <td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-200">플랫폼-독립 통신</span></td>
+                            <td class="px-6 py-4 text-gray-600">위성 통신 탑재체, 지상국 시스템 중심. 안정적 캐시플로우.</td>
+                            <td class="px-6 py-4 text-gray-600">안정적 보완재 역할</td>
+                        </tr>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-bold text-gray-900">LHX</td>
+                            <td class="px-6 py-4"><span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-red-200">국방 우주 특화</span></td>
+                            <td class="px-6 py-4 text-gray-600">미사일 경보/추적, 우주 감시, 전자전 센서 집중 (Niche Player).</td>
+                            <td class="px-6 py-4 text-red-600 font-bold">★ 알짜 성장 (High Margin)</td>
+                        </tr>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-bold text-gray-900">RTX</td>
+                            <td class="px-6 py-4"><span class="bg-orange-100 text-orange-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-orange-200">엔드투엔드 솔루션</span></td>
+                            <td class="px-6 py-4 text-gray-600">미사일 경보 + 민간 지구 관측 + 클라우드 관제. 가장 넓은 범위.</td>
+                            <td class="px-6 py-4 text-gray-600">광범위 노출 (but 경기민감)</td>
+                        </tr>
+                        <tr class="bg-gray-50 hover:bg-gray-100">
+                            <td class="px-6 py-4 font-bold text-gray-900">NOC</td>
+                            <td class="px-6 py-4"><span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-purple-200">풀스택 프라임</span></td>
+                            <td class="px-6 py-4 text-gray-600">위성체(Bus), 발사체, 우주 정거장 등 대형 시스템 통합자.</td>
+                            <td class="px-6 py-4 text-gray-600">진정한 우주기업 (but CAPEX 부담)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Detailed Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- GD Detail -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-600 hover:shadow-lg transition-shadow page-break-inside-avoid">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">General Dynamics (GD)</h3>
+                        <i class="ph ph-broadcast text-2xl text-blue-500"></i>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <p class="font-medium text-gray-500 uppercase text-xs">사업 영역: Mission Systems</p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li>위성 자체보다는 <strong>탑재 통신장비, 암호화, 지상국</strong>에 집중.</li>
+                            <li>고정 수주 및 유지보수 성격이 강해 현금흐름이 매우 안정적.</li>
+                            <li><strong>투자 포인트:</strong> 우주 사업이 변동성을 줄여주는 '안정판' 역할.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- LHX Detail -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-red-600 hover:shadow-lg transition-shadow page-break-inside-avoid">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">L3Harris (LHX)</h3>
+                        <i class="ph ph-radar text-2xl text-red-500"></i>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <p class="font-medium text-gray-500 uppercase text-xs">사업 영역: Space & Airborne Systems</p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><strong>'Resilient Space'</strong>: 미사일 추적(SDA), PNT, 전자전 등 고부가 핵심 틈새 장악.</li>
+                            <li>지정학적 위협(미사일) 증가의 직접적 수혜.</li>
+                            <li><strong>투자 포인트:</strong> 섹터 내 상위권의 마진율과 견조한 성장성을 가진 알짜 플레이어.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- RTX Detail -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-600 hover:shadow-lg transition-shadow page-break-inside-avoid">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">RTX Corp (RTX)</h3>
+                        <i class="ph ph-globe-hemisphere-east text-2xl text-orange-500"></i>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <p class="font-medium text-gray-500 uppercase text-xs">사업 영역: Raytheon & Collins</p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li>방산(미사일 경보)과 민간(지구 관측, 데이터)을 아우르는 <strong>최대 스펙트럼</strong>.</li>
+                            <li>AWS 협력 등 데이터/SW 역량 강화 중.</li>
+                            <li><strong>투자 포인트:</strong> 기술적 넓이는 좋으나, 상업 항공 비중이 높아 거시 경기 리스크 노출 큼.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- NOC Detail -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-600 hover:shadow-lg transition-shadow page-break-inside-avoid">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Northrop Grumman (NOC)</h3>
+                        <i class="ph ph-rocket text-2xl text-purple-500"></i>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <p class="font-medium text-gray-500 uppercase text-xs">사업 영역: Space Systems</p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li>위성 본체부터 발사체, 우주정거장까지 만드는 <strong>Prime Contractor</strong>.</li>
+                            <li>대형 국책 프로젝트(NASA, 안보) 중심.</li>
+                            <li><strong>투자 포인트:</strong> 진정한 '우주 대장주'이나, 대형 프로젝트 특유의 R&D 비용 부담과 실적 변동성 존재.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- END TAB 2 -->
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12 py-8 no-print">
+        <div class="container mx-auto px-4 text-center text-gray-500 text-xs">
+            <p class="mb-2">본 보고서는 정보 제공을 목적으로 하며, 특정 증권의 매수/매도 추천이 아닙니다.</p>
+            <p>&copy; 2025 Market Strategy Division. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Script for Tabs -->
+    <script>
+        function switchTab(tabName) {
+            // Hide all contents
+            document.getElementById('content-macro').classList.add('hidden');
+            document.getElementById('content-space').classList.add('hidden');
+            
+            // Deactivate all tabs
+            document.getElementById('tab-macro').className = 'tab-inactive py-4 text-sm md:text-base transition-all flex items-center gap-2 whitespace-nowrap';
+            document.getElementById('tab-space').className = 'tab-inactive py-4 text-sm md:text-base transition-all flex items-center gap-2 whitespace-nowrap';
+
+            // Show selected content
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+
+            // Activate selected tab
+            document.getElementById('tab-' + tabName).className = 'tab-active py-4 text-sm md:text-base transition-all flex items-center gap-2 whitespace-nowrap';
+            
+            // Scroll to top lightly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
