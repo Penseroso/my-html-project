@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>단기금리 조절 메커니즘</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .plot-container .main-svg { background: transparent !important; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+  <div class="max-w-6xl mx-auto p-4 md:p-10">
+    <!-- Header Section -->
+    <header class="mb-10 text-center md:text-left">
+      <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-indigo-600 uppercase bg-indigo-100 rounded-full">
+        Fed Monetary Policy Tool
+      </div>
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-4">
+        단기금리 조절 메커니즘 시각화
+      </h1>
+      <p class="text-lg text-slate-600 max-w-2xl leading-relaxed">
+        연준은 시장금리가 <span class="text-indigo-600 font-bold">상단(IORB)</span>과 <span class="text-rose-600 font-bold">하단(ON RRP)</span> 사이의 "금리 채널" 내에 머물도록 관리함.
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Controls Panel -->
+      <aside class="lg:col-span-4 space-y-6">
+        <section class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 border border-slate-100">
+          <h2 class="text-lg font-bold mb-6 flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+            시뮬레이션 설정
+          </h2>
+          
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">IORB (상단 금리, %)</label>
+              <input id="iorb" type="number" step="0.01" value="5.40"
+                     class="w-full rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all border">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">ON RRP (하단 금리, %)</label>
+              <input id="onrrp" type="number" step="0.01" value="5.20"
+                     class="w-full rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all border">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">EFFR 스프레드 (%p)</label>
+              <input id="effrSpread" type="number" step="0.01" value="0.05"
+                     class="w-full rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all border">
+              <p class="mt-1 text-[11px] text-slate-500">IORB 대비 목표 위치 설정값임.</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">시장 상황 (SOFR 모드)</label>
+              <select id="mode" class="w-full rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all border appearance-none">
+                <option value="normal">안정적 (Normal)</option>
+                <option value="stress">분기말 스트레스 (Spike)</option>
+              </select>
+            </div>
+
+            <button id="rerender" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 flex justify-center items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              데이터 업데이트
+            </button>
+          </div>
+        </section>
+
+        <!-- Tooltip Card -->
+        <div class="bg-indigo-50 rounded-3xl p-6 border border-indigo-100">
+          <p class="text-sm text-indigo-900 leading-relaxed">
+            <span class="font-bold">Pro Tip:</span> IORB와 ON RRP 간격이 좁을수록 연준의 금리 통제력이 강화되며 시장 변동성이 억제됨.
+          </p>
+        </div>
+      </aside>
+
+      <!-- Main Chart Area -->
+      <main class="lg:col-span-8 space-y-6">
+        <section class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-4 border border-slate-100">
+          <div id="chart" class="w-full" style="height: 550px;"></div>
+        </section>
+
+        <!-- Content Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2 text-lg">
+              <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+              핵심 메커니즘
+            </h3>
+            <ul class="text-sm text-slate-600 space-y-3 leading-snug">
+              <li class="flex gap-2">
+                <span class="font-bold text-slate-800">1.</span>
+                <span>은행은 연준 예치 시 IORB를 받으므로 이보다 낮은 금리로 대출할 유인이 없음.</span>
+              </li>
+              <li class="flex gap-2">
+                <span class="font-bold text-slate-800">2.</span>
+                <span>비은행(MMF 등)은 연준 ON RRP를 통해 최저 금리를 보장받으며 하단을 지지함.</span>
+              </li>
+              <li class="flex gap-2">
+                <span class="font-bold text-slate-800">3.</span>
+                <span>시장 금리(EFFR)는 이 사이에서 형성되며 통상 IORB보다 소폭 낮게 형성됨.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2 text-lg">
+              <span class="w-2 h-2 bg-rose-500 rounded-full"></span>
+              모니터링 포인트
+            </h3>
+            <ul class="text-sm text-slate-600 space-y-3 leading-snug">
+              <li>• <span class="font-semibold text-slate-800 underline decoration-indigo-200">EFFR-IORB 스프레드</span> 축소는 시장 내 유동성 타이트화를 시사함.</li>
+              <li>• <span class="font-semibold text-slate-800 underline decoration-indigo-200">SOFR 스파이크</span>는 레포 시장의 담보 수급 불균형이나 분기말 결산 시기에 발생함.</li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+<script>
+(function () {
+  function mulberry32(a) {
+    return function() {
+      let t = a += 0x6D2B79F5;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+  }
+
+  function buildSeries(base, n, amplitude, seed) {
+    const rnd = mulberry32(seed);
+    const y = [];
+    let drift = 0;
+    for (let i = 0; i < n; i++) {
+      drift += (rnd() - 0.5) * amplitude * 0.08;
+      const noise = (rnd() - 0.5) * amplitude;
+      y.push(base + noise + drift);
+    }
+    return y;
+  }
+
+  function clampSeries(y, lo, hi) {
+    return y.map(v => Math.min(hi, Math.max(lo, v)));
+  }
+
+  function render() {
+    const iorb = Number(document.getElementById("iorb").value);
+    const onrrp = Number(document.getElementById("onrrp").value);
+    const effrSpread = Number(document.getElementById("effrSpread").value);
+    const mode = document.getElementById("mode").value;
+
+    const top = Math.max(iorb, onrrp);
+    const bottom = Math.min(iorb, onrrp);
+
+    const n = 31;
+    const x = Array.from({length:n}, (_,i) => i+1);
+
+    let effr = buildSeries(top - effrSpread, n, 0.015, 42);
+    effr = clampSeries(effr, bottom + 0.005, top - 0.005);
+
+    let sofr = buildSeries((top + bottom)/2, n, 0.04, 88);
+    if (mode === "stress") {
+      const spikes = [27, 28, 30]; 
+      spikes.forEach(d => { if (d < n) sofr[d] += 0.14; });
+    }
+    sofr = clampSeries(sofr, bottom - 0.03, top + (mode === "stress" ? 0.12 : 0.03));
+
+    const traces = [
+      {
+        x: [1, n], y: [top, top], mode: 'lines', line: {width: 0}, showlegend: false, hoverinfo: 'none'
+      },
+      {
+        x: [1, n], y: [bottom, bottom], mode: 'lines', line: {width: 0}, fill: 'tonexty', 
+        fillcolor: 'rgba(99, 102, 241, 0.05)', showlegend: false, hoverinfo: 'none'
+      },
+      {
+        x, y: Array(n).fill(iorb), mode: "lines", name: "IORB (상단)",
+        line: {color: '#6366f1', width: 2, dash: 'dash'},
+        hovertemplate: "%{y:.2f}%<extra></extra>"
+      },
+      {
+        x, y: Array(n).fill(onrrp), mode: "lines", name: "ON RRP (하단)",
+        line: {color: '#f43f5e', width: 2, dash: 'dash'},
+        hovertemplate: "%{y:.2f}%<extra></extra>"
+      },
+      {
+        x, y: effr, mode: "lines+markers", name: "EFFR (무담보)",
+        line: {color: '#0f172a', width: 3},
+        marker: {size: 6, symbol: 'circle'},
+        hovertemplate: "Day %{x}: %{y:.2f}%<extra></extra>"
+      },
+      {
+        x, y: sofr, mode: "lines+markers", name: "SOFR (담보)",
+        line: {color: '#8b5cf6', width: 3},
+        marker: {size: 6, symbol: 'diamond'},
+        hovertemplate: "Day %{x}: %{y:.2f}%<extra></extra>"
+      }
+    ];
+
+    const layout = {
+      showlegend: true,
+      legend: { orientation: "h", y: -0.15, x: 0.5, xanchor: 'center' },
+      margin: { l: 50, r: 30, t: 40, b: 80 },
+      hovermode: 'x unified',
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
+      xaxis: {
+        title: { text: "일자 (Day)", font: { size: 12, color: '#64748b' } },
+        gridcolor: '#f1f5f9',
+        zeroline: false
+      },
+      yaxis: {
+        title: { text: "금리 (%)", font: { size: 12, color: '#64748b' } },
+        range: [bottom - 0.1, top + 0.2],
+        gridcolor: '#f1f5f9',
+        zeroline: false,
+        tickformat: '.2f'
+      },
+      annotations: [
+        {
+          x: 5, y: iorb, text: "IORB (상단 저지선)", showarrow: true, arrowhead: 2, ax: 0, ay: -30,
+          font: { color: '#6366f1', weight: 'bold' }, bgcolor: 'white'
+        },
+        {
+          x: 5, y: onrrp, text: "ON RRP (하단 지지선)", showarrow: true, arrowhead: 2, ax: 0, ay: 30,
+          font: { color: '#f43f5e', weight: 'bold' }, bgcolor: 'white'
+        }
+      ]
+    };
+
+    const config = { displayModeBar: false, responsive: true };
+    Plotly.newPlot("chart", traces, layout, config);
+  }
+
+  document.getElementById("rerender").addEventListener("click", render);
+  ["iorb", "onrrp", "effrSpread", "mode"].forEach(id => {
+    document.getElementById(id).addEventListener("input", render);
+  });
+
+  window.onload = render;
+})();
+</script>
+</body>
+</html>
