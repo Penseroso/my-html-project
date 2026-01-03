@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>매출/손익 용어 개념 가이드</title>
+
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+
+  <style>
+    body { font-family: "Pretendard", sans-serif; }
+    .js-plotly-plot .plotly .modebar { display: none !important; }
+
+    /* Prevent Plotly from overflowing its container (common in embeds) */
+    #waterfall-chart { width: 100%; max-width: 100%; }
+    #waterfall-chart .plot-container,
+    #waterfall-chart .svg-container {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 p-4 md:p-8">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header Section -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+        <span class="w-2 h-6 bg-indigo-600 rounded-full"></span>
+        매출 및 손익 지표 체계도
+      </h1>
+      <p class="text-slate-500 text-sm mt-1">
+        총매출에서 최종 당기순이익까지의 흐름
+        <span class="ml-2 inline-block text-slate-400">(Index 기준: Gross Sales = 100)</span>
+      </p>
+    </div>
+
+    <!-- Chart Card -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+      <div id="waterfall-chart" class="w-full" style="height: 560px;"></div>
+
+      <!-- Notes (kept outside the plot area to avoid overlap with x-axis labels) -->
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="text-xs font-semibold text-slate-700">마진 기준</div>
+          <div class="text-xs text-slate-600 mt-1 leading-relaxed">
+            GM = Gross Profit / Net Sales<br />
+            OM = Operating Income / Net Sales<br />
+            NM = Net Income / Net Sales
+          </div>
+        </div>
+        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="text-xs font-semibold text-slate-700">해석 스케일</div>
+          <div class="text-xs text-slate-600 mt-1 leading-relaxed">
+            개념도 Index 예시: Gross Sales = 100<br />
+            실제 재무제표 금액/공시 수치를 의미하지 않음
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      /**
+       * 목표(개념 습득 최적화) 반영 사항
+       * 1) Other/Tax를 분리: Interest/Other(비영업) → EBT(total) → Taxes(법인세) → Net Income(total)
+       * 2) total bar의 누적값을 JS에서 계산해 hover에 명시(customdata)
+       * 3) x축 라벨 한/영 병기
+       * 4) Index 기준 문구/각주 추가
+       * 5) 녹색(total) 막대에만 마진 라벨(GM/OM/NM) 표시
+       * 6) hoverinfo 대신 hovertemplate + <extra></extra>로 포맷 고정
+       */
+
+      // 1) 개념 정의(설명 + 공식)
+      //    type: absolute/relative/total
+      const concepts = [
+        {
+          key: "gross_sales",
+          label: "Gross Sales (총매출)",
+          desc: "공제 전 총판매액이며, 매출 계산의 출발점임.",
+          formula: "Index 기준 100으로 설정",
+          val: 100,
+          type: "absolute"
+        },
+        {
+          key: "deductions",
+          label: "Deductions (공제)",
+          desc: "반품·에누리·할인 등 총매출에서 차감되는 항목임.",
+          formula: "Net Sales = Gross Sales − Deductions",
+          val: -15,
+          type: "relative"
+        },
+        {
+          key: "net_sales",
+          label: "Net Sales (순매출)",
+          desc: "공제 반영 후 매출로, 손익계산서상 매출의 기준임.",
+          formula: "Net Sales = Gross Sales − Deductions",
+          val: 0,
+          type: "total"
+        },
+        {
+          key: "cogs",
+          label: "COGS (매출원가)",
+          desc: "제품 생산/서비스 제공에 직접 귀속되는 원가임.",
+          formula: "Gross Profit = Net Sales − COGS",
+          val: -35,
+          type: "relative"
+        },
+        {
+          key: "gross_profit",
+          label: "Gross Profit (매출총이익)",
+          desc: "매출에서 원가를 제외한 이익으로, 기초 수익성 지표임.",
+          formula: "Gross Profit = Net Sales − COGS",
+          val: 0,
+          type: "total"
+        },
+        {
+          key: "sga",
+          label: "SG&A (판관비)",
+          desc: "인건비·마케팅·임차료 등 영업 유지를 위한 비용(판매관리비)임.",
+          formula: "Operating Income = Gross Profit − SG&A",
+          val: -30,
+          type: "relative"
+        },
+        {
+          key: "op_income",
+          label: "Operating Income (영업이익)",
+          desc: "본업(영업활동)에서 창출한 이익임.",
+          formula: "Operating Income = Gross Profit − SG&A",
+          val: 0,
+          type: "total"
+        },
+        {
+          key: "nonop",
+          label: "Interest/Other (비영업)",
+          desc: "이자수익/비용 등 비영업 손익(영업 외 요인)임.",
+          formula: "EBT = Operating Income + Non-operating",
+          val: -6,
+          type: "relative"
+        },
+        {
+          key: "ebt",
+          label: "EBT (법인세차감전이익)",
+          desc: "법인세 차감 전 이익으로, 세금 전 수익성 지표임.",
+          formula: "EBT = Operating Income + Non-operating",
+          val: 0,
+          type: "total"
+        },
+        {
+          key: "taxes",
+          label: "Taxes (법인세)",
+          desc: "국가에 납부하는 법인세(세금 비용)임.",
+          formula: "Net Income = EBT − Taxes",
+          val: -4,
+          type: "relative"
+        },
+        {
+          key: "net_income",
+          label: "Net Income (당기순이익)",
+          desc: "모든 비용과 세금을 반영한 최종 이익(Bottom Line)임.",
+          formula: "Net Income = EBT − Taxes",
+          val: 0,
+          type: "total"
+        }
+      ];
+
+      // 2) 누적값 계산 (total bar의 의미를 hover에 명시)
+      const cumulative = [];
+      let running = 0;
+      for (const c of concepts) {
+        if (c.type === "absolute") {
+          running = c.val;
+          cumulative.push(running);
+        } else if (c.type === "relative") {
+          running += c.val;
+          cumulative.push(c.val); // relative 항목은 변화량을 표시
+        } else if (c.type === "total") {
+          // total 항목은 현재 누적 합계를 표시
+          cumulative.push(running);
+        }
+      }
+
+      // 3) 마진 계산(녹색 total bar에만 짧게 표시)
+      const findCum = (key) => cumulative[concepts.findIndex(x => x.key === key)];
+      const netSales = findCum("net_sales");
+      const grossProfit = findCum("gross_profit");
+      const opIncome = findCum("op_income");
+      const netIncome = findCum("net_income");
+
+      const pct = (num) => (netSales === 0 ? 0 : (num / netSales) * 100);
+      const gm = pct(grossProfit);
+      const om = pct(opIncome);
+      const nm = pct(netIncome);
+
+      // total bar 라벨(짧게): 총계 중 Net Sales는 기준이므로 마진 표시 제외
+      const totalTextMap = {
+        gross_profit: `GM ${gm.toFixed(0)}%`,
+        op_income: `OM ${om.toFixed(0)}%`,
+        net_income: `NM ${nm.toFixed(0)}%`
+      };
+
+      const barText = concepts.map(c => (c.type === "total" ? (totalTextMap[c.key] || "") : ""));
+
+      // 4) hovertemplate 구성: 정의 + 공식 + 값(변화량/누적) + (Net Sales 대비 %)
+      const hoverText = concepts.map((c, i) => {
+        const value = cumulative[i];
+        const isRelative = c.type === "relative";
+
+        // 퍼센트 표기: relative는 Net Sales 대비 변화 비중을 보여주면 이해가 빠름
+        const pctOfNet = (netSales === 0) ? 0 : (Math.abs(isRelative ? c.val : value) / netSales) * 100;
+
+        const valueLine = isRelative
+          ? `변화량: <b>${c.val > 0 ? "+" : ""}${c.val}</b> (Index)`
+          : `누적값: <b>${value}</b> (Index)`;
+
+        const pctLine = (c.key === "gross_sales")
+          ? ""
+          : `Net Sales 대비: <b>${pctOfNet.toFixed(1)}%</b>`;
+
+        return {
+          title: c.label,
+          desc: c.desc,
+          formula: c.formula,
+          valueLine,
+          pctLine
+        };
+      });
+
+      // customdata: hovertemplate에서 참조할 객체를 배열로 전달
+      const customdata = hoverText.map(h => [h.title, h.desc, h.formula, h.valueLine, h.pctLine]);
+
+      const data = [{
+        type: "waterfall",
+        orientation: "v",
+        measure: concepts.map(c => c.type),
+        x: concepts.map(c => c.label),
+        y: concepts.map(c => c.val),
+
+        // total bar에만 마진 라벨 표시
+        text: barText,
+        textposition: "outside",
+        // Ensure labels never render outside the plotting area (prevents "삐져나옴")
+        cliponaxis: true,
+
+        customdata,
+        hovertemplate:
+          "<b>%{customdata[0]}</b>" +
+          "<br><br>%{customdata[1]}" +
+          "<br><br><span style='color:#cbd5e1'>공식</span>: %{customdata[2]}" +
+          "<br><span style='color:#cbd5e1'>값</span>: %{customdata[3]}" +
+          "<br>%{customdata[4]}" +
+          "<extra></extra>",
+
+        hoverlabel: {
+          bgcolor: "#0f172a",
+          font: { color: "#ffffff", size: 13, family: "Pretendard" },
+          align: "left"
+        },
+
+        connector: {
+          line: { color: "rgba(148, 163, 184, 0.35)", width: 1, dash: "dot" }
+        },
+
+        decreasing: { marker: { color: "#fda4af" } },
+        increasing: { marker: { color: "#93c5fd" } },
+        totals:     { marker: { color: "#34d399" } }
+      }];
+
+      const layout = {
+        // We'll set width explicitly based on container to avoid overflow in embeds.
+        autosize: false,
+        // x축 라벨 공간을 넉넉히 확보(하단 주석은 차트 밖으로 분리)
+        margin: { t: 30, b: 130, l: 20, r: 20 },
+        showlegend: false,
+        font: { family: "Pretendard, sans-serif", size: 13 },
+        plot_bgcolor: "rgba(0,0,0,0)",
+        paper_bgcolor: "rgba(0,0,0,0)",
+
+        xaxis: {
+          tickfont: { color: "#475569", size: 12 },
+          fixedrange: true,
+          tickangle: -30,
+          gridcolor: "rgba(0,0,0,0)",
+          automargin: true
+        },
+
+        // 개념도이므로 y축은 최소 정보만 제공: 0선은 유지, 눈금은 숨김
+        yaxis: {
+          showticklabels: false,
+          showgrid: false,
+          fixedrange: true,
+          zeroline: true,
+          zerolinecolor: "#e2e8f0"
+        }
+      };
+
+      const config = {
+        responsive: true,
+        displayModeBar: false
+      };
+
+      // 5) Fit plot strictly to its container width (prevents horizontal overflow)
+      const el = document.getElementById("waterfall-chart");
+
+      // Compute running min/max to give headroom for outside labels while staying inside plot
+      let r = 0;
+      let minR = Number.POSITIVE_INFINITY;
+      let maxR = Number.NEGATIVE_INFINITY;
+      for (const c of concepts) {
+        if (c.type === "absolute") r = c.val;
+        else if (c.type === "relative") r += c.val;
+        // total does not change r
+        minR = Math.min(minR, r);
+        maxR = Math.max(maxR, r);
+      }
+
+      function computeWidth() {
+        const w = Math.floor(el.getBoundingClientRect().width);
+        return (Number.isFinite(w) && w > 0) ? w : 900;
+      }
+
+      // Set explicit width + y-range headroom
+      layout.width = computeWidth();
+      layout.yaxis.range = [minR - 12, maxR + 18];
+
+      Plotly.newPlot(el, data, layout, config);
+
+      // Reflow on resize (use relayout to avoid full redraw)
+      window.addEventListener("resize", () => {
+        const w = computeWidth();
+        Plotly.relayout(el, { width: w });
+      });
+
+      // If embedded environments adjust width after load, do a delayed relayout
+      setTimeout(() => {
+        const w = computeWidth();
+        Plotly.relayout(el, { width: w });
+      }, 250);
+    })();
+  </script>
+</body>
+</html>
