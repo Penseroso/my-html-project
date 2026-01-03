@@ -20,7 +20,7 @@
         Fed Monetary Policy Tool
       </div>
       <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-4">
-        단기금리 조절 메커니즘
+        단기금리 조절 메커니즘 시각화
       </h1>
       <p class="text-lg text-slate-600 max-w-2xl leading-relaxed">
         연준은 시장금리가 <span class="text-indigo-600 font-bold">상단(IORB)</span>과 <span class="text-rose-600 font-bold">하단(ON RRP)</span> 사이의 "금리 채널" 내에 머물도록 관리함.
@@ -217,19 +217,27 @@
       },
       yaxis: {
         title: { text: "금리 (%)", font: { size: 12, color: '#64748b' } },
-        range: [bottom - 0.1, top + 0.2],
+        range: [bottom - 0.15, top + 0.25],
         gridcolor: '#f1f5f9',
         zeroline: false,
         tickformat: '.2f'
       },
       annotations: [
         {
-          x: 5, y: iorb, text: "IORB (상단 저지선)", showarrow: true, arrowhead: 2, ax: 0, ay: -30,
-          font: { color: '#6366f1', weight: 'bold' }, bgcolor: 'white'
+          x: 3, y: iorb, text: "IORB (상단 저지선)", showarrow: true,
+          arrowhead: 2, arrowsize: 1, arrowwidth: 1.5, arrowcolor: '#6366f1',
+          ax: 0, ay: -55, // 수직 간격 확대
+          font: { color: '#4f46e5', weight: 'bold', size: 12 },
+          bgcolor: 'rgba(255, 255, 255, 0.9)',
+          bordercolor: '#c7d2fe', borderwidth: 1, borderpad: 4
         },
         {
-          x: 5, y: onrrp, text: "ON RRP (하단 지지선)", showarrow: true, arrowhead: 2, ax: 0, ay: 30,
-          font: { color: '#f43f5e', weight: 'bold' }, bgcolor: 'white'
+          x: 28, y: onrrp, text: "ON RRP (하단 지지선)", showarrow: true,
+          arrowhead: 2, arrowsize: 1, arrowwidth: 1.5, arrowcolor: '#f43f5e',
+          ax: 0, ay: 55, // 수직 간격 확대
+          font: { color: '#e11d48', weight: 'bold', size: 12 },
+          bgcolor: 'rgba(255, 255, 255, 0.9)',
+          bordercolor: '#fecdd3', borderwidth: 1, borderpad: 4
         }
       ]
     };
@@ -239,13 +247,8 @@
   }
 
   document.getElementById("rerender").addEventListener("click", render);
-  ["iorb", "onrrp", "effrSpread", "mode"].forEach(id => {
-    document.getElementById(id).addEventListener("input", render);
-  });
-
   window.onload = render;
 })();
 </script>
 </body>
-
 </html>
